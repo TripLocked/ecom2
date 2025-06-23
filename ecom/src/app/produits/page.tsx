@@ -1,71 +1,96 @@
+"use client";
+
 import { produits } from "@/data/produits";
+import { useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
+import Fuse from "fuse.js";
 import ProductCard from "@/components/ProductCard";
-import Link from "next/link";
 
-export default function Produits() {
+export default function ListeProduits() {
+  const searchParams = useSearchParams();
+  const [category, setCategory] = useState("all");
+  const searchTerm = searchParams.get("search")?.trim() || "";
+
+  const fuse = useMemo(() => {
+    return new Fuse(produits, {
+      keys: ["nom", "description"],
+      threshold: 0.4,
+      ignoreLocation: true,
+      useExtendedSearch: true,
+    });
+  }, []);
+
+  const filteredProduits = useMemo(() => {
+    let result = produits;
+
+    if (category !== "all") {
+      result = result.filter((p) =>
+        (category === "new" && p.isNew) ||
+        (category === "popular" && p.isPopular) ||
+        (category === "sale" && p.promotion)
+      );
+    }
+
+    if (searchTerm) {
+      result = fuse.search(searchTerm).map((r) => r.item);
+    }
+
+    return result;
+  }, [searchTerm, category, fuse]);
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4">
-            Nos Produits
-          </h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Découvrez notre collection soigneusement sélectionnée de produits d'exception
-          </p>
-          
-          {/* Decorative line */}
-          <div className="w-24 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto mt-6 rounded-full"></div>
+    <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-slate-900">Tous nos produits</h1>
+          <p className="text-slate-600 mt-2">Explorez notre catalogue exclusif</p>
         </div>
 
-        {/* Filters Section (optionnel) */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          <button className="px-6 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors duration-200">
-            Tous
-          </button>
-          <button className="px-6 py-2 bg-slate-200 text-slate-700 rounded-full hover:bg-slate-300 transition-colors duration-200">
-            Nouveautés
-          </button>
-          <button className="px-6 py-2 bg-slate-200 text-slate-700 rounded-full hover:bg-slate-300 transition-colors duration-200">
-            Populaires
-          </button>
-          <button className="px-6 py-2 bg-slate-200 text-slate-700 rounded-full hover:bg-slate-300 transition-colors duration-200">
-            Promotions
-          </button>
-        </div>
+        <div className="bg-white p-6 rounded-2xl shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <input
+              type="text"
+              placeholder="Rechercher un produit..."
+              defaultValue={searchTerm}
+              className="w-full sm:w-2/3 px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-neutral-800 placeholder:text-neutral-800"
+              onChange={(e) => {
+                const value = e.target.value;
+                const url = new URL(window.location.href);
+                if (value.trim()) {
+                  url.searchParams.set("search", value);
+                } else {
+                  url.searchParams.delete("search");
+                }
+                window.history.replaceState(null, "", url.toString());
+              }}
+            />
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {produits.map((produit) => (
-            <Link 
-              key={produit.id} 
-              href={`/produits/${produit.id}`}
-              className="group block transform hover:scale-105 transition-all duration-300"
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full sm:w-1/3 px-4 py-2 border border-slate-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-neutral-800 placeholder:text-neutral-800"
             >
-              <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-slate-100">
-                <ProductCard produit={produit} />
-              </div>
-            </Link>
-          ))}
+              <option value="all" className="text-neutral-800">Toutes les catégories</option>
+              <option value="new" className="text-neutral-800">Nouveautés</option>
+              <option value="popular" className="text-neutral-800">Populaires</option>
+              <option value="sale" className="text-neutral-800">En promotion</option>
+            </select>
+          </div>
         </div>
 
-        {/* Call to Action */}
-        <div className="text-center mt-16 p-8 bg-white rounded-2xl shadow-sm">
-          <h3 className="text-2xl font-semibold text-slate-800 mb-4">
-            Vous ne trouvez pas ce que vous cherchez ?
-          </h3>
-          <p className="text-slate-600 mb-6">
-            Contactez-nous pour des recommandations personnalisées
-          </p>
-          <Link 
-              href="/contact"
-              className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 transition-colors duration-200 font-medium"
-            >
-              Nous Contacter
-            </Link>
-        </div>
+        {filteredProduits.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredProduits.map((produit) => (
+              <ProductCard key={produit.id} produit={produit} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center text-slate-500 mt-12">
+            <div className="text-6xl mb-4">🔍</div>
+            <p className="text-lg">Aucun produit ne correspond à votre recherche.</p>
+          </div>
+        )}
       </div>
-    </main>
+    </div>
   );
 }

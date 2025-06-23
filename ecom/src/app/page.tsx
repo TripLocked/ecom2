@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { produits } from "@/data/produits";
 
 export default function Home() {
   return (
@@ -58,70 +59,75 @@ export default function Home() {
                 </motion.button>
               </Link>
               
-              <motion.button
+              <Link href="/a-propos">
+                <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-xl font-semibold text-lg hover:border-indigo-300 hover:text-indigo-600 transition-all duration-200"
-              >
-                En savoir plus
-              </motion.button>
+                >
+              En savoir plus
+            </motion.button>
+          </Link>
+
             </motion.div>
           </motion.div>
         </div>
       </div>
+      {/* Produits Populaires */}
+<div className="py-16 bg-gradient-to-br from-white via-slate-50 to-indigo-50">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
+      className="text-center mb-12"
+    >
+      <h2 className="text-3xl font-bold text-slate-800 mb-4">Produits Populaires</h2>
+      <p className="text-slate-600 max-w-2xl mx-auto">
+        Explorez nos meilleures ventes soigneusement sélectionnées pour vous.
+      </p>
+    </motion.div>
 
-      {/* Features Section */}
-      <div className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">
-              Pourquoi nous choisir ?
-            </h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">
-              Une expérience d'achat exceptionnelle avec des produits de qualité supérieure
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: "🎯",
-                title: "Qualité Premium",
-                description: "Sélection rigoureuse de produits haut de gamme pour une satisfaction garantie"
-              },
-              {
-                icon: "🚀",
-                title: "Livraison Rapide",
-                description: "Expédition sous 24h avec suivi en temps réel de votre commande"
-              },
-              {
-                icon: "💎",
-                title: "Service Client",
-                description: "Support dédié et personnalisé pour vous accompagner dans vos achats"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2, duration: 0.6 }}
-                viewport={{ once: true }}
-                className="bg-slate-50 p-8 rounded-2xl hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="text-4xl mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-3">{feature.title}</h3>
-                <p className="text-slate-600 leading-relaxed">{feature.description}</p>
-              </motion.div>
-            ))}
+<div className="grid md:grid-cols-3 gap-8">
+  {produits
+    .filter((produit) => produit.isPopular)
+    .slice(0, 3) // Optionnel : limite à 3 produits
+    .map((product, index) => (
+      <motion.div
+        key={product.id}
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.2, duration: 0.6 }}
+        viewport={{ once: true }}
+        className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+      >
+        <Link href={`/produits/${product.id}`}>
+          <div className="h-56 w-full bg-gray-100 overflow-hidden">
+            <img 
+              src={product.image} 
+              alt={product.nom} 
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            />
           </div>
-        </div>
-      </div>
+          <div className="p-4">
+            <h3 className="text-lg font-semibold text-slate-800 mb-2">{product.nom}</h3>
+            <p className="text-indigo-600 font-bold text-md">{product.prix.toFixed(2)}€</p>
+          </div>
+        </Link>
+      </motion.div>
+    ))}
+</div>
+
+    <div className="mt-12 text-center">
+      <Link href="/produits">
+        <button className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+          Voir tous les produits
+        </button>
+      </Link>
+    </div>
+  </div>
+</div>
     </main>
   );
 }

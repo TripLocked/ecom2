@@ -1,11 +1,13 @@
-// src/types/produit.ts
 export interface Produit {
   id: string;
   nom: string;
   description: string;
-  image?: string;
   prix: number;
-  prixOriginal?: number;
-  promotion?: number;
-  rating?: number;
+  prixOriginal?: number; // Prix original (optionnel, pour les promotions)
+  promotion?: number; // Pourcentage de promotion (optionnel)
+  image: string;
+  rating: number;
+  isNew: boolean; // Indique si le produit est nouveau
+  isPopular: boolean; // Indique si le produit est populaire
+  isOnSale: boolean; // Indique si le produit est en promotion
 }
