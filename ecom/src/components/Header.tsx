@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,92 +16,100 @@ export default function Header() {
     if (search.trim()) {
       router.push(`/produits?search=${encodeURIComponent(search.trim())}`);
       setSearch("");
-      setMenuOpen(false); // ferme le menu mobile si ouvert
+      setMenuOpen(false);
     }
   };
 
   return (
-    <header className="bg-white shadow sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Link href="/" className="flex items-center space-x-2" aria-label="Accueil">
-            <span className="text-2xl font-bold text-blue-600">M</span>
-            <span className="text-lg font-semibold text-gray-700">Ma Boutique</span>
-          </Link>
-        </div>
+    <header className="bg-[#0d1117] border-b border-indigo-800 sticky top-0 z-50 shadow-sm">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 h-16 flex items-center justify-between text-slate-300">
+        <Link href="/" className="flex items-center space-x-2" aria-label="Accueil">
+          <motion.span
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-2xl font-extrabold text-indigo-400 select-none"
+          >
+            M
+          </motion.span>
+          <motion.span
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-lg font-semibold text-slate-300 select-none"
+          >
+            Ma Boutique
+          </motion.span>
+        </Link>
 
-        {/* Desktop navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <Link href="/" className="text-gray-700 hover:text-blue-500">Accueil</Link>
-          <Link href="/produits" className="text-gray-700 hover:text-blue-500">Produits</Link>
-          <Link href="/contact" className="text-gray-700 hover:text-blue-500">Contact</Link>
-          <form onSubmit={handleSearch} className="flex items-center space-x-2">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher..."
-              className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-neutral-800 placeholder:text-neutral-800"
-            />
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+        {/* Navigation desktop */}
+        <nav className="hidden md:flex items-center space-x-8 text-indigo-400 font-medium select-none">
+          {[
+            { href: "/", label: "Accueil" },
+            { href: "/produits", label: "Produits" },
+            { href: "/contact", label: "Contact" },
+          ].map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="hover:text-indigo-600 transition-colors duration-300"
             >
-              Chercher
-            </button>
-          </form>
+              {label}
+            </Link>
+          ))}
         </nav>
 
-        {/* Mobile toggle */}
+        {/* Toggle menu mobile */}
         <button
-          className="md:hidden text-gray-700"
-          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden text-indigo-400 hover:text-indigo-600 transition"
+          aria-label="Menu mobile"
+          onClick={() => setMenuOpen((open) => !open)}
         >
-          {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          {menuOpen ? <X size={26} /> : <Menu size={26} />}
         </button>
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="md:hidden px-4 py-2 space-y-2 bg-white border-t border-gray-200">
-          <Link
-            href="/"
-            className="block text-gray-700 hover:text-blue-500"
-            onClick={() => setMenuOpen(false)}
+      {/* Menu mobile animé */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden bg-[#121823] border-t border-indigo-700 px-6 py-4 space-y-4 text-indigo-400 font-medium select-none"
           >
-            Accueil
-          </Link>
-          <Link
-            href="/produits"
-            className="block text-gray-700 hover:text-blue-500"
-            onClick={() => setMenuOpen(false)}
-          >
-            Produits
-          </Link>
-          <Link
-            href="/contact"
-            className="block text-gray-700 hover:text-blue-500"
-            onClick={() => setMenuOpen(false)}
-          >
-            Contact
-          </Link>
-          <form onSubmit={handleSearch} className="flex items-center space-x-2 mt-2">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher..."
-              className="flex-1 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-            >
-              Go
-            </button>
-          </form>
-        </div>
-      )}
+            {[
+              { href: "/", label: "Accueil" },
+              { href: "/produits", label: "Produits" },
+              { href: "/contact", label: "Contact" },
+            ].map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setMenuOpen(false)}
+                className="block hover:text-indigo-600 transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+
+            <form onSubmit={handleSearch} className="flex items-center space-x-2 mt-2">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Rechercher..."
+                className="flex-1 px-3 py-2 rounded-lg border border-indigo-600 bg-[#161b22] text-slate-300 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              />
+              <button
+                type="submit"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition"
+              >
+                Go
+              </button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

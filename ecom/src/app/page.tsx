@@ -2,80 +2,103 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { produits } from "@/data/produits";
+import { useState, useEffect } from "react";
+
+const carouselImages = [
+  "/images/anime1.jpg",
+  "/images/anime2.jpg",
+  "/images/anime3.jpg",
+  "/images/anime4.jpg",
+];
 
 export default function Home() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % carouselImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Hero Section */}
+    <main className="min-h-screen bg-gradient-to-br from-[#0d1117] via-[#161b22] to-[#0d1117] text-slate-300">
+      {/* Hero Section with animated bg */}
       <div className="relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-32 w-80 h-80 bg-gradient-to-br from-indigo-100 to-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-gradient-to-br from-purple-100 to-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+        {/* Animated blurred background circles */}
+        <div className="absolute inset-0 overflow-hidden -z-10">
+          <div className="absolute -top-40 -right-32 w-96 h-96 bg-gradient-to-br from-purple-900 to-indigo-800 rounded-full mix-blend-screen filter blur-3xl opacity-50 animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-32 w-96 h-96 bg-gradient-to-br from-pink-800 to-purple-900 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-pulse"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
+        <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-24 pb-20 text-center">
+          {/* Carousel */}
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 1 }}
+            className="mx-auto mb-12 max-w-4xl rounded-xl overflow-hidden shadow-lg border border-indigo-700"
+          >
+            <img
+              src={carouselImages[currentIndex]}
+              alt={`Anime image ${currentIndex + 1}`}
+              className="w-full object-cover h-64 sm:h-96"
+              draggable={false}
+            />
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-500 mb-6"
+          >
+            Ta <span>Boîte Mystère Anime</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="max-w-2xl mx-auto text-lg text-slate-400 leading-relaxed mb-10"
+          >
+            Choisis 10 animes parmi plus de 100 titres cultes, et reçois 3 figurines surprises inspirées de tes choix — le tout dans une boîte à 50€ frais de port inclus. Une expérience unique pour les vrais fans.
+          </motion.p>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto"
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
           >
-            <motion.h1 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.8 }}
-              className="text-5xl md:text-6xl font-bold text-slate-800 mb-6"
-            >
-              Ma Boutique 
-              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                {" "}Unique
-              </span>
-            </motion.h1>
-            
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.8 }}
-              className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto leading-relaxed"
-            >
-              Découvrez une sélection soigneusement curatée de produits modernes, 
-              conçus pour sublimer votre quotidien avec élégance et simplicité.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-            >
-              <Link href="/produits">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-                >
-                  Découvrir nos produits
-                </motion.button>
-              </Link>
-              
-              <Link href="/a-propos">
-                <motion.button
+            <Link href="/produits">
+              <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-xl font-semibold text-lg hover:border-indigo-300 hover:text-indigo-600 transition-all duration-200"
-                >
-              En savoir plus
-            </motion.button>
-          </Link>
+                className="bg-gradient-to-r from-indigo-700 to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                Commencer ma sélection
+              </motion.button>
+            </Link>
 
-            </motion.div>
+            <Link href="/a-propos">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="border-2 border-indigo-600 text-indigo-400 px-8 py-4 rounded-xl font-semibold text-lg hover:border-pink-500 hover:text-pink-400 transition-all duration-300"
+              >
+                En savoir plus
+              </motion.button>
+            </Link>
           </motion.div>
         </div>
       </div>
-      {/* Produits Populaires */}
-<div className="py-16 bg-gradient-to-br from-white via-slate-50 to-indigo-50">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+{/* Section figurines populaires */}
+<section className="py-16 bg-[#121823]">
+  <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -83,51 +106,29 @@ export default function Home() {
       viewport={{ once: true }}
       className="text-center mb-12"
     >
-      <h2 className="text-3xl font-bold text-slate-800 mb-4">Produits Populaires</h2>
-      <p className="text-slate-600 max-w-2xl mx-auto">
-        Explorez nos meilleures ventes soigneusement sélectionnées pour vous.
+      <h2 className="text-3xl font-bold text-indigo-400 mb-4">Figurines mises en avant</h2>
+      <p className="text-slate-400 max-w-2xl mx-auto">
+        Un aperçu des trésors que tu pourrais retrouver dans ta boîte mystère. Chaque figurine est soigneusement choisie pour sa rareté et son style.
       </p>
     </motion.div>
 
-<div className="grid md:grid-cols-3 gap-8">
-  {produits
-    .filter((produit) => produit.isPopular)
-    .slice(0, 3) // Optionnel : limite à 3 produits
-    .map((product, index) => (
-      <motion.div
-        key={product.id}
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.2, duration: 0.6 }}
-        viewport={{ once: true }}
-        className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
-      >
-        <Link href={`/produits/${product.id}`}>
-          <div className="h-56 w-full bg-gray-100 overflow-hidden">
-            <img 
-              src={product.image} 
-              alt={product.nom} 
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-            />
+    <div className="grid md:grid-cols-3 gap-8">
+      {[1, 2, 3].map((_, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.2, duration: 0.6 }}
+          viewport={{ once: true }}
+          className="bg-white rounded-2xl shadow-md border border-gray-300 h-56 flex items-center justify-center"
+        >
+          {/* Ici tu pourras remplacer ce div par une image plus tard */}
+          <div className="w-40 h-40 bg-gray-100 rounded-lg"></div>
+        </motion.div>
+              ))}
           </div>
-          <div className="p-4">
-            <h3 className="text-lg font-semibold text-slate-800 mb-2">{product.nom}</h3>
-            <p className="text-indigo-600 font-bold text-md">{product.prix.toFixed(2)}€</p>
-          </div>
-        </Link>
-      </motion.div>
-    ))}
-</div>
-
-    <div className="mt-12 text-center">
-      <Link href="/produits">
-        <button className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
-          Voir tous les produits
-        </button>
-      </Link>
-    </div>
-  </div>
-</div>
+        </div>
+      </section>
     </main>
   );
 }
